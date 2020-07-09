@@ -37,23 +37,6 @@ struct Trie {
 
 #[wasm_bindgen]
 impl Trie {
-  fn insert_root(&mut self, word: &Vec<u8>){
-    let first: u8 = *word.first().unwrap();
-
-    let node: TrieNode = TrieNode {
-        key: first,
-        parent: ptr::null(),
-        terminal: false,
-        children: HashMap::new()
-    };
-    
-    let root: Option<TrieNode> = {
-        Some(node)
-    };
-
-    self.root = root;
-  }
-
   #[wasm_bindgen(constructor)]
   pub fn new() -> Trie {
     Trie { root: None }
@@ -63,8 +46,21 @@ impl Trie {
   #[wasm_bindgen]
   pub fn insert(&mut self, word: Vec<u8>) {
     if self.root.is_none() {
-        self.insert_root(&word);
-        return
+      let first: u8 = *word.first().unwrap();
+
+      let node: TrieNode = TrieNode {
+          key: first,
+          parent: ptr::null(),
+          terminal: false,
+          children: HashMap::new()
+      };
+      
+      let root: Option<TrieNode> = {
+          Some(node)
+      };
+  
+      self.root = root;
+      return
     }
 
     let mut root= self.root.as_mut().unwrap();
@@ -103,27 +99,29 @@ impl Trie {
   }
 
   #[wasm_bindgen]
-  pub fn find(&mut self, prefix: Vec<u8>) -> Vec<u8> {
-    let mut output: Vec<u8> = Vec::new();
-    let mut node = self.root.as_mut().unwrap();
+  pub fn find(&mut self, prefix: Vec<u8>) -> Clamped<Vec<u8>> {
+    let mut v: Vec<u8> = 
+    Clamped::new()
+    // let mut output: Clamped<Vec<u8>> = Clamped::new(Vec::new());
+    // let mut node = self.root.as_mut().unwrap();
     
-    for char in prefix.iter() {
-        if node.children.contains_key(&char) {
-            node = node.children.get_mut(&char).unwrap()
-        } else {
-            return output
-        }
-    }
+    // for char in prefix.iter() {
+    //     if node.children.contains_key(&char) {
+    //         node = node.children.get_mut(&char).unwrap()
+    //     } else {
+    //         return output
+    //     }
+    // }
     
-    if node.terminal {
-      output = node.get_word();
-      return output
-    }
-    // self.find_all_words(node, output);
-    return output;
+    // if node.terminal {
+    //   output = node.get_word();
+    //   return output
+    // }
+    // // self.find_all_words(node, output);
+    // return output;
   }
 
-//   #[wasm_bindgen]
+  // #[wasm_bindgen]
   // pub fn find_all_words(&self, node: &TrieNode, output: Vec<u8>){
   //   if (node.end) {
   //     arr.unshift(node.getWord());
